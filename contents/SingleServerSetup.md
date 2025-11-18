@@ -16,13 +16,13 @@ By the end of this chapter, you'll be able to:
 
 Let's start with the basics. Before you can build massive, distributed systems that handle millions of users, you need to understand where everything begins: the single server setup.
 
-Think of it like this—your entire application lives on one machine. Your web app, database, cache, and everything else share the same home. It's all running on a single physical or virtual server. Simple, right?
+Think of it like this your entire application lives on one machine. Your web app, database, cache, and everything else share the same home. It's all running on a single physical or virtual server. Simple, right?
 
-And honestly, there's nothing wrong with that. In fact, most successful applications started exactly this way. You don't need a complex architecture on day one. A single server is often the smartest choice when you're just getting started. It teaches you the fundamentals of system design, helps you understand resource management, and forces you to think about trade-offs—lessons that'll serve you well when you eventually need to scale up.
+And honestly, there's nothing wrong with that. In fact, most successful applications started exactly this way. You don't need a complex architecture on day one. A single server is often the smartest choice when you're just getting started. It teaches you the fundamentals of system design, helps you understand resource management, and forces you to think about trade-offs lessons that'll serve you well when you eventually need to scale up.
 
 ![alt text](./images/image.png)
 
-**Figure 1-1** shows you the big picture—everything living together on one server, with users connecting from their browsers and mobile apps, while DNS helps translate domain names into actual addresses.
+**Figure 1-1** shows you the big picture everything living together on one server, with users connecting from their browsers and mobile apps, while DNS helps translate domain names into actual addresses.
 
 ---
 
@@ -47,13 +47,13 @@ Here's why domain names are awesome:
 - **Flexible**: You can change servers behind the scenes without breaking everyone's bookmarks
 - **Smart routing**: One domain can point to multiple servers for load balancing
 
-DNS (Domain Name System) is like the internet's phone book—it translates those friendly names into actual IP addresses that computers understand. It's a massive, distributed system that works incredibly well.
+DNS (Domain Name System) is like the internet's phone book it translates those friendly names into actual IP addresses that computers understand. It's a massive, distributed system that works incredibly well.
 
 **Real-world tip**: Most companies don't run their own DNS servers. Instead, they use services like Amazon Route 53, Cloudflare, or Google Cloud DNS. Why? These providers handle the complexity, keep things fast and reliable worldwide, and protect against attacks. It's one less thing to worry about.
 
 #### Stage 2: Getting the IP Address
 
-Once your browser asks "where's hackora.tech?", the DNS system goes to work. It's actually a bit like asking for directions—your request bounces through a few different servers:
+Once your browser asks "where's hackora.tech?", the DNS system goes to work. It's actually a bit like asking for directions your request bounces through a few different servers:
 
 1. **DNS Resolver**: Usually your internet provider handles this, though you can use others like Google (8.8.8.8)
 2. **Root Name Servers**: These point you toward the right neighborhood
@@ -62,11 +62,11 @@ Once your browser asks "where's hackora.tech?", the DNS system goes to work. It'
 
 In our example, `www.hackora.tech` comes back as `11.222.33.444`. Now your browser knows exactly where to connect.
 
-**Quick note**: To keep things fast, DNS answers get cached everywhere—in your browser, your computer, your router. Each answer comes with a TTL (Time-to-Live) value that says how long it's good for. This way, you're not looking up the same address over and over again.
+**Quick note**: To keep things fast, DNS answers get cached everywhere in your browser, your computer, your router. Each answer comes with a TTL (Time-to-Live) value that says how long it's good for. This way, you're not looking up the same address over and over again.
 
 #### Stage 3: Making the Request
 
-Now that your browser knows where to find the server, it's time to actually connect and ask for something. This happens over HTTP (or HTTPS for secure connections). But first, your browser and the server need to shake hands—literally called a "three-way handshake":
+Now that your browser knows where to find the server, it's time to actually connect and ask for something. This happens over HTTP (or HTTPS for secure connections). But first, your browser and the server need to shake hands literally called a "three-way handshake":
 
 1. **SYN**: "Hey server, I want to talk to you!"
 2. **SYN-ACK**: "Cool, I'm listening. Ready when you are!"
@@ -95,296 +95,359 @@ The response looks different depending on who's asking:
 
 **For web browsers**: Your server sends back HTML (the structure), CSS (the styling), and JavaScript (the interactive bits). The browser takes all this and builds the page you see. It constructs what's called a DOM (Document Object Model), applies the styles, and runs the JavaScript to make things interactive.
 
-**For mobile apps and APIs**: Instead of HTML, your server sends back JSON—a simple, text-based format that's easy for any programming language to understand. It looks something like `{"name": "John", "age": 30}`. Clean, lightweight, and universally compatible. That's why pretty much every modern API uses JSON.
+**For mobile apps and APIs**: Instead of HTML, your server sends back JSON a simple, text-based format that's easy for any programming language to understand. It looks something like `{"name": "John", "age": 30}`. Clean, lightweight, and universally compatible. That's why pretty much every modern API uses JSON.
 
-### Who's Connecting to Your Server?
+## Top Interview Questions & Answers
 
-Your single server handles traffic from two main types of clients, and they talk to your server in different ways.
+### 1. **"What are the main limitations of a single server architecture?"**
 
-#### Web Browsers
+**Expected Answer:**
 
-Web applications have a split personality—some code runs on your server, and some runs in the user's browser:
+- **Availability**: No failover mechanism; downtime affects all users
+- **Scalability**: Limited to vertical scaling; hitting hardware limits
+- **Performance**: CPU/memory/disk shared between all services
+- **Deployment Risk**: Updates require downtime or risk entire system
+- **Security**: One breach compromises everything
 
-**Server-side (your code)**
-This runs on your server using languages like Java, Python, Ruby, PHP, Node.js, or Go. It handles:
+---
 
-- The core business logic and rules
-- Saving and fetching data from your database
-- Making sure users are who they say they are (authentication)
-- Checking what users are allowed to do (authorization)
-- Keeping track of user sessions
-- Talking to other services and APIs
-- Keeping everything secure
+### 2. **"How would you handle increased traffic in a single server setup?"**
 
-**Client-side (runs in the browser)**
-This is the stuff users actually see and interact with:
+**Expected Answer:**
 
-- **HTML**: The structure and content of your pages
-- **CSS**: How everything looks—colors, layouts, fonts, animations
-- **JavaScript**: Makes things interactive and dynamic, updates the page without reloading
+- **Short-term**: Vertical scaling (upgrade CPU, RAM, SSD)
+- **Optimization**:
+  - Enable caching (Redis/Memcached)
+  - Optimize database queries and add indexes
+  - Implement CDN for static assets
+  - Enable compression (Gzip)
+  - Use connection pooling
+- **Long-term**: Migrate to distributed architecture
 
-This split is actually pretty smart. Your server handles the sensitive, important stuff securely, while the browser handles the user interface and makes everything feel fast and responsive.
+---
 
-#### Mobile Apps
+### 3. **"Why do both www.mysite.com and api.mysite.com point to the same server?"**
 
-Mobile apps (whether native iOS/Android or cross-platform like React Native or Flutter) talk to your server using the same HTTP/HTTPS protocol. They hit your API endpoints, use standard HTTP methods (GET, POST, etc.), and get responses back.
+**Expected Answer:**
 
-These apps almost always use JSON for data because it just makes sense:
+- **Cost Efficiency**: Small applications don't need separate servers
+- **Simplicity**: Easier to manage one server initially
+- **Logical Separation**: Different domains provide:
+  - Clear API boundaries
+  - Different routing rules
+  - Separate SSL certificates possible
+  - CORS configuration
+- **Virtual Hosts**: Web server (Nginx/Apache) routes based on domain
 
-- **Simple**: Both humans and computers can read it easily
-- **Universal**: Every programming language can work with it
-- **Lightweight**: Less data to send over mobile networks compared to bulky formats like XML
-- **JavaScript-friendly**: Since JavaScript powers so much of the web, JSON is a natural fit
+---
 
-**Example API Interaction:**
+### 4. **"What's the difference between vertical and horizontal scaling? Which applies here?"**
 
-```http
-GET /users/12 HTTP/1.1
-Host: api.hackora.tech
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Accept: application/json
+**Expected Answer:**
+
+- **Vertical Scaling (Scale Up)**:
+  - Add more CPU, RAM, disk to existing server
+  - Applicable to single server setup
+  - Has hard limits (maximum hardware capacity)
+  - Requires downtime for upgrades
+- **Horizontal Scaling (Scale Out)**:
+  - Add more servers/instances
+  - Not possible in single server setup
+  - Nearly unlimited scaling
+  - Requires load balancer and distributed architecture
+
+---
+
+### 5. **"How would you ensure high availability in this architecture?"**
+
+**Expected Answer:**
+
+- **You can't truly** achieve high availability with single server, but you can:
+  - **Automated Backups**: Regular snapshots to restore quickly
+  - **Monitoring & Alerts**: Uptime monitoring (Pingdom, DataDog)
+  - **Process Monitoring**: Use PM2, Supervisor to auto-restart crashed processes
+  - **Health Checks**: Implement endpoint monitoring
+  - **Disaster Recovery Plan**: Document recovery procedures
+- **Real HA Solution**: Need multi-server architecture with load balancing
+
+---
+
+### 6. **"What metrics would you monitor in a single server setup?"**
+
+**Expected Answer:**
+
+- **System Metrics**:
+  - CPU utilization (should be < 70%)
+  - Memory usage (watch for memory leaks)
+  - Disk I/O and space
+  - Network bandwidth
+- **Application Metrics**:
+  - Response time / latency
+  - Error rates (4xx, 5xx)
+  - Request per second (RPS)
+  - Database query performance
+- **Tools**: CloudWatch, Prometheus, Grafana, New Relic
+
+---
+
+### 7. **"How does DNS resolution work in this architecture?"**
+
+**Expected Answer:**
+
+1. User types `api.mysite.com` in browser/app
+2. Device checks local DNS cache
+3. If not cached, queries recursive DNS resolver (ISP)
+4. Resolver queries root DNS → TLD DNS (.com) → Authoritative DNS
+5. Authoritative DNS returns A record: `15.125.23.214`
+6. IP cached at multiple levels (browser, OS, ISP)
+7. User connects directly to that IP
+
+**TTL Impact**: Time-To-Live determines how long IP is cached
+
+---
+
+### 8. **"What happens when you deploy new code to this server?"**
+
+**Expected Answer:**
+
+**Without Zero-Downtime:**
+
+1. SSH into server
+2. Stop application
+3. Pull new code from Git
+4. Install dependencies
+5. Run migrations
+6. Start application
+7. **Result**: 30 seconds to 5 minutes downtime
+
+**Better Approach:**
+
+- Use process managers (PM2) with `reload` instead of `restart`
+- Blue-green deployment simulation
+- Database migrations before code deployment
+- Health checks before switching traffic
+
+---
+
+### 9. **"Company: 'We're experiencing slow API responses. How would you debug?'"**
+
+**Step-by-Step Answer:**
+
+1. **Check System Resources**:
+
+   ```bash
+   top, htop      # CPU/Memory
+   iostat         # Disk I/O
+   netstat        # Network connections
+   ```
+
+2. **Application Logs**:
+
+   - Check error logs
+   - Look for timeouts, exceptions
+
+3. **Database**:
+
+   - Slow query log analysis
+   - Missing indexes
+   - Connection pool exhaustion
+
+4. **Network**:
+
+   - Check latency: `ping, traceroute`
+   - DNS resolution time
+
+5. **Application Code**:
+   - Profile code (New Relic APM)
+   - N+1 query problems
+   - Inefficient algorithms
+
+---
+
+### 10. **"How would you migrate from single server to multi-server architecture?"**
+
+**Migration Strategy:**
+
+1. **Separate Database First**:
+
+   - Move DB to managed service (RDS)
+   - Update connection strings
+   - Test thoroughly
+
+2. **Add Load Balancer**:
+
+   - Deploy ALB/NLB
+   - Keep single app server initially
+   - Update DNS to point to LB
+
+3. **Horizontal Scaling**:
+
+   - Create application server AMI
+   - Launch additional instances
+   - Configure auto-scaling
+
+4. **Separate Static Assets**:
+
+   - Move to S3 + CloudFront CDN
+
+5. **Add Caching Layer**:
+
+   - Deploy Redis/ElastiCache
+
+6. **Final Architecture**:
+   - LB → Multiple App Servers → DB + Cache
+
+---
+
+### 11. **"What security concerns exist in single server setup?"**
+
+**Answer:**
+
+- **Single Attack Surface**: All services exposed on one machine
+- **Lateral Movement**: If attacker gets in, they access everything
+- **No Network Segmentation**: Can't isolate database from public internet
+- **Mitigation**:
+  - Firewall rules (only ports 80/443 open)
+  - Regular security updates
+  - Principle of least privilege
+  - Web Application Firewall (WAF)
+  - Fail2ban for brute force protection
+  - SSL/TLS certificates
+
+---
+
+### 12. **"Estimate the maximum users this setup can handle"**
+
+**Calculation Approach:**
+
+```
+Assumptions:
+- Server: 4 vCPU, 16GB RAM
+- Each request: 50ms processing time
+- Concurrent connections: 1000
+
+Theoretical Max RPS = (1000 concurrent) / (0.05s) = 20,000 RPS
+
+Realistic Max (70% capacity): ~14,000 RPS
+
+If each user makes 10 requests/minute:
+Max Users = 14,000 RPS * 60s / 10 = ~84,000 users/minute
 ```
 
-**Response:**
+**Variables Affecting Capacity:**
 
-```json
-{
-  "id": 12,
-  "username": "john_doe",
-  "email": "john@example.com",
-  "first_name": "John",
-  "last_name": "Doe",
-  "created_at": "2024-01-15T10:30:00Z",
-  "last_login": "2025-11-17T08:45:22Z",
-  "profile": {
-    "avatar_url": "https://cdn.hackora.tech/avatars/12.jpg",
-    "bio": "Software engineer and system design enthusiast"
-  }
-}
-```
-
-This gives mobile apps a clean, predictable way to create, read, update, and delete data on your server.
+- Database query complexity
+- Payload size
+- CPU-intensive operations
+- Memory per request
 
 ---
 
-## Why Single Server Setups Are Actually Pretty Great
+### 13. **"Real Scenario: Server CPU hits 100% at 3 AM. What do you do?"**
 
-Don't let anyone tell you that single server architectures are "too simple" or "not real engineering." They have some serious advantages, especially when you're starting out.
+**Immediate Actions:**
 
-### It's Beautifully Simple
+1. **Identify Process**: `top` or `htop` to find culprit
+2. **Check Logs**: Look for errors, unusual patterns
+3. **Restart if Needed**: If it's a runaway process
+4. **Scale Vertically**: Temporarily upgrade instance if possible
 
-With everything on one server, life is just... easier. Here's why:
+**Investigation:**
 
-- **One place for everything**: All your configs, logs, and code live together
-- **Easy to monitor**: Just watch one server instead of juggling dozens
-- **Minimal tools needed**: No Kubernetes, no orchestration complexity, no distributed system headaches
-- **Quick onboarding**: New team members can understand the setup in a day, not a month
+- Was it a cron job? (backups, batch processing)
+- DDoS attack? (check access logs)
+- Memory leak causing swap usage?
+- Sudden traffic spike?
 
-This simplicity is a feature, not a bug. You can focus on building your actual product instead of wrestling with infrastructure. That's valuable, especially in the early days.
+**Prevention:**
 
-### It's Cheaper
-
-One server means one bill. It's that simple:
-
-- **Lower hosting costs**: Pay for one instance, not ten
-- **Cheaper licenses**: Many software licenses are priced per server
-- **Less admin time**: You're not managing a fleet of servers
-- **No cross-server networking fees**: Cloud providers love to charge for data moving between servers
-
-This makes single servers perfect for startups watching every dollar, side projects, internal tools, and any app that doesn't need to handle massive traffic yet.
-
-### Everything Is Close Together
-
-Here's something cool: when your database, cache, and application all live on the same server, they can talk to each other really, really fast:
-
-- **Local loopback** (127.0.0.1): Your app talks to your database with basically zero network delay
-- **Unix sockets**: Even faster than network connections
-- **Shared memory**: Components can share data directly in memory
-
-No network latency between your app and database means faster queries, faster cache lookups, and snappier responses overall. It's one of those underrated benefits that actually makes a noticeable difference.
-
-### Development Is a Breeze
-
-As a developer, you'll love working with a single server setup:
-
-- **Run everything locally**: Your laptop can mirror production exactly
-- **Debug easily**: All your logs are in one place, not scattered across services
-- **Simple testing**: No need to mock complex distributed behaviors
-- **Deploy fast**: Push code and restart. Done. No waiting for orchestration systems
-- **One log file**: Well, maybe a few, but they're all on one machine
-
-You can go from idea to testing in minutes, not hours. That's huge when you're iterating quickly.
-
-### Backups Are Straightforward
-
-Disaster recovery doesn't have to be complicated:
-
-- **One snapshot, everything**: Take a snapshot of your server and you've got your entire application backed up
-- **Easy restore**: Spin up the snapshot and you're back in business
-- **No sync issues**: You don't have to worry about keeping multiple servers' data consistent
-- **Less storage**: You're not storing redundant copies across a dozen servers
-
-Your database, configs, uploaded files—everything gets backed up together. If something goes wrong, recovery is straightforward. No complicated distributed transaction rollbacks or data sync nightmares.
+- Schedule heavy jobs during off-peak hours
+- Rate limiting
+- Resource alerts before reaching 100%
+- Consider offloading batch jobs to separate worker
 
 ---
 
-## The Downsides (And They're Real)
+### 14. **"How do you handle database backups in single server?"**
 
-Okay, let's be honest. Single server setups have some serious limitations. As your app grows or your reliability needs increase, these issues become harder to ignore.
+**Answer:**
 
-### Everything Lives or Dies Together
+- **Automated Daily Backups**:
 
-This is the big one. If your server goes down for any reason, your entire application goes dark. No redundancy, no failover, no backup. Here's what can go wrong:
+  - Cron job for mysqldump/pg_dump
+  - Store on S3 with versioning
+  - Retention policy (daily: 7 days, weekly: 4 weeks, monthly: 12 months)
 
-**Hardware dies**:
+- **Snapshot-based**:
 
-- Hard drives fail (and they will eventually)
-- RAM goes bad and crashes your system
-- CPUs can fail
-- Network cards stop working
-- Power supplies give out
+  - EBS snapshots if on AWS
+  - Faster recovery
 
-**Software breaks**:
+- **Testing**:
 
-- Your app crashes from a bug
-- The operating system kernel panics
-- Database gets corrupted
-- Memory leaks eat up all your RAM until things grind to a halt
+  - Regularly test restoration process
+  - Verify backup integrity
 
-**Human mistakes**:
-
-- You need to do maintenance and take the server offline
-- Security patches require a reboot
-- Someone makes a config change that breaks everything
-
-Any of these means your site is completely offline. Every user affected. Potential revenue lost. Support tickets flooding in. Not fun.
-
-**Real talk**: Even 99.9% uptime (three nines) means about 9 hours of downtime per year. That might sound good until you realize that's a full workday where your service is unavailable. Most modern businesses need way better than that.
-
-### You Hit a Ceiling
-
-With a single server, your only option is "vertical scaling"—buying a bigger, beefier machine. But there are limits:
-
-**Physics gets in the way**:
-
-- Servers only have so many CPU sockets
-- There's a maximum amount of RAM a motherboard can hold
-- You can only fit so much in a rack
-
-**Money gets in the way**:
-
-- High-end servers get exponentially more expensive
-- Doubling your server's power might triple or quadruple the cost
-- Enterprise hardware comes with enterprise price tags
-
-Eventually, you literally can't buy a bigger server. You've hit the wall. At that point, your only option is "horizontal scaling"—adding more servers and distributing the work. But once you do that, you're no longer in single-server land.
-
-### Everything Fights for Resources
-
-When everything shares one server, components are constantly competing for CPU, memory, and disk:
-
-**CPU wars**: Running a heavy report generation job? Your API requests might start timing out because they can't get enough CPU time.
-
-**Memory battles**: If your cache starts eating up all available RAM, other parts of your app might start swapping to disk, which is painfully slow.
-
-**Disk bottlenecks**: Database writes, log files, and backups all want disk bandwidth. They end up waiting in line, slowing everything down.
-
-**Network saturation**: Less common, but if you get slammed with traffic, your network interface can max out.
-
-The problem is that one component having a bad day can drag down your entire application. A slow database query affects API response times. A memory leak in one service crashes the whole server. Everything's connected, for better or worse.
-
-### You Can't Beat Physics
-
-Here's something you can't work around: the speed of light. If your server is in Virginia and your user is in Tokyo, their requests have to travel thousands of miles. That takes time.
-
-**The reality**:
-
-- California to Virginia: at least 60ms round-trip, even in perfect conditions
-- International requests: easily 150-300ms or more
-- Real-world internet routing adds even more delay
-
-For interactive apps, this matters. Research shows that users notice anything over 100ms. Above 1 second, people start getting frustrated and lose focus.
-
-If you have a global user base, a single server in one location means some users are always getting a slow experience. The solution—CDNs and regional servers—requires moving beyond the single server model.
-
-### You Can't Scale Just One Thing
-
-Here's a frustrating scenario: your database is maxed out at 85% CPU, but your application server is cruising at 30%. Your cache is barely working at 20%.
-
-In a distributed setup, you'd just add more database capacity. Problem solved.
-
-With a single server? You have to upgrade the entire machine. You're buying more CPU for your app server that doesn't need it. More memory for your cache that's barely being used. You're essentially paying for capacity you don't need just to fix the one thing that's actually bottlenecked.
-
-It's like having to buy a bigger house when all you really need is a bigger garage. Wasteful and expensive.
-
-### Maintenance Means Downtime
-
-Need to update your server? You're taking the whole site offline:
-
-- Security patches that require a reboot
-- Database upgrades
-- Application deployments that need a restart
-- Replacing failing hardware
-- Adding more storage
-
-Every single one of these creates a window where your service is unavailable. For businesses that need 24/7 uptime, that's a dealbreaker. Distributed systems can do "rolling updates"—updating one server at a time while others handle the traffic. Can't do that with just one server.
-
-### All Your Eggs in One Basket (Security-Wise)
-
-If someone breaks into your server, they've got everything. Your app, your database, your secrets—all of it.
-
-**Ways you can get hacked**:
-
-- Web app vulnerabilities like SQL injection or XSS
-- Operating system exploits
-- Database security holes
-- That one library you forgot to update
-
-**What they get**:
-
-- Access to all your data
-- Control of the entire system with one privilege escalation
-- No barriers or boundaries to slow them down
-
-In distributed architectures, you have layers of defense—network segments, isolated components, separate security zones. A breach in one area doesn't automatically mean everything's compromised. With a single server, there's no defense in depth. It's all or nothing.
+- **Downside of Single Server**:
+  - Backups compete for resources
+  - Point-in-time recovery limited
 
 ---
 
-## When Should You Actually Use a Single Server?
+### 15. **"Companies like Amazon/Netflix ask: When would you NOT use a single server?"**
 
-Knowing when a single server makes sense (and when it doesn't) is crucial:
+**Don't Use Single Server When:**
 
-**Perfect for**:
+- **High Availability Required**: Financial apps, healthcare
+- **Expected High Traffic**: Viral potential, marketing campaigns
+- **Geographic Distribution**: Users across continents (need regional servers)
+- **Regulatory Compliance**: Data sovereignty requirements
+- **Sensitive Data**: Need network segmentation
+- **24/7 Operations**: Can't afford downtime for maintenance
 
-- Proof-of-concept projects and MVPs
-- Internal tools with maybe 50-100 concurrent users
-- Development and testing environments
-- Personal projects and small business sites
-- Apps with steady, predictable traffic (under 10,000 requests/hour)
-- Startups in the early stages watching their budget
+**When Single Server is OK:**
 
-**Time to move on when**:
-
-- You're outgrowing your server's capacity
-- You need serious uptime guarantees (99.95% or higher)
-- You have users all over the world who need low latency
-- Security requirements demand isolated components
-- Different parts of your system need to scale independently
+- Internal tools with <100 users
+- MVP/Prototype validation
+- Development environments
+- Personal projects
+- Budget constrained startups
 
 ---
 
-## Wrapping Up
+## Real Company Interview Scenarios
 
-Single server architecture is where almost everyone starts—and for good reason. It's simple, cheap, easy to develop on, and perfect for getting something off the ground quickly.
+### **Amazon/AWS:**
 
-You get all your components on one machine, which makes deployment easy, development fast, and backups straightforward. Internal communication is lightning-fast since nothing has to cross a network.
+_"Design a system that starts with single server but can scale to millions of users"_
 
-But the trade-offs are real. You've got no redundancy (when the server goes down, everything goes down), limited scaling options, components competing for resources, potential geographic latency issues, maintenance downtime, and concentrated security risks.
+**Answer**: Start with single EC2, then:
 
-The request flow is pretty straightforward though: DNS figures out your IP, the client connects, sends an HTTP request, and your server processes it and sends back a response—either HTML for browsers or JSON for mobile apps and APIs.
-
-The key takeaway? Start simple. Master the fundamentals with a single server setup. Learn how requests flow, how resources are managed, and what the trade-offs are. When you outgrow it—and you might—you'll have a solid foundation for understanding distributed systems, load balancers, and microservices.
-
-Don't over-engineer from day one. Begin with a single server, validate your idea, grow your user base, and scale up when you actually need to. That's how most successful systems are built.
+- Phase 1: Move DB to RDS
+- Phase 2: Add ALB + Auto Scaling
+- Phase 3: CloudFront CDN
+- Phase 4: ElastiCache
+- Phase 5: Multi-region deployment
 
 ---
+
+### **Google:**
+
+_"Calculate the cost difference between single server vs distributed for 10K daily users"_
+
+**Single Server**:
+
+- t3.xlarge: $0.1664/hr × 720hr = ~$120/month
+
+**Distributed**:
+
+- ALB: $20/month
+- 2× t3.medium: $60/month
+- RDS: $80/month
+- Total: ~$160/month
+
+**Difference**: $40/month = 33% increase for redundancy
+
+---
+
+This comprehensive guide covers the theoretical knowledge and practical scenarios companies typically ask about single server architectures!
